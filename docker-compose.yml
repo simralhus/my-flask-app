@@ -1,0 +1,33 @@
+services:
+  # 1. Nginx - Qapıçı
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - web
+
+  # 2. Flask Tətbiqimiz
+  web:
+    build: .
+    env_file:
+      - .env
+    # Artıq 5000-ci portu xaricə açmağa ehtiyac yoxdur, 
+    # çünki istifadəçi Nginx-ə (80-ci port) müraciət edəcək.
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+
+  # 3. PostgreSQL Baza
+  db:
+    image: postgres:15
+    env_file:
+      - .env
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
